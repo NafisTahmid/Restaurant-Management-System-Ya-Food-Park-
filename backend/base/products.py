@@ -1,0 +1,122 @@
+products = [
+    {
+        "_id": "1",
+        "name": "Margherita Pizza",
+        "image": "/images/margherita-pizza.png",
+        "description": (
+            "Classic Italian pizza with fresh mozzarella, tomato sauce, and basil leaves. "
+            "Hand-tossed dough baked to perfection in a wood-fired oven"
+        ),
+        "brand": "Pizzeria Napoli",
+        "category": "Pizza",
+        "price": 12.99,
+        "countInStock": 15,
+        "rating": 4.5,
+        "numReviews": 28,
+    },
+    {
+        "_id": "2",
+        "name": "Chicken Biryani",
+        "image": "/images/chicken-biriyani.png",
+        "description": (
+            "Aromatic basmati rice cooked with tender chicken pieces, exotic spices, and saffron. "
+            "Served with raita and papad"
+        ),
+        "brand": "Spice Garden",
+        "category": "Indian",
+        "price": 14.99,
+        "countInStock": 8,
+        "rating": 4.8,
+        "numReviews": 45,
+    },
+    {
+        "_id": "3",
+        "name": "California Roll Sushi Box",
+        "image": "/images/california-roll.png",
+        "description": (
+            "Fresh sushi rolls with crab meat, avocado, and cucumber wrapped in seasoned rice "
+            "and nori. Includes 8 pieces with wasabi and ginger"
+        ),
+        "brand": "Tokyo Sushi Bar",
+        "category": "Japanese",
+        "price": 10.99,
+        "countInStock": 12,
+        "rating": 4.3,
+        "numReviews": 22,
+    },
+    {
+        "_id": "4",
+        "name": "Double Cheeseburger",
+        "image": "/images/cheese-burger.png",
+        "description": (
+            "Two juicy beef patties with melted cheddar cheese, lettuce, tomatoes, pickles, "
+            "and special sauce. Served with crispy fries and a drink"
+        ),
+        "brand": "Burger House",
+        "category": "American",
+        "price": 11.99,
+        "countInStock": 20,
+        "rating": 4.6,
+        "numReviews": 67,
+    },
+    {
+        "_id": "5",
+        "name": "Pad Thai Noodles",
+        "image": "/images/pad-thai.png",
+        "description": (
+            "Traditional Thai stir-fried rice noodles with shrimp, tofu, bean sprouts, peanuts, "
+            "and tamarind sauce. Perfectly balanced sweet and savory flavors"
+        ),
+        "brand": "Thai Street Kitchen",
+        "category": "Thai",
+        "price": 13.49,
+        "countInStock": 0,
+        "rating": 4.7,
+        "numReviews": 38,
+    },
+    {
+        "_id": "6",
+        "name": "Caesar Salad Bowl",
+        "image": "/images/caesar-salad.png",
+        "description": (
+            "Crisp romaine lettuce tossed with parmesan cheese, croutons, and creamy Caesar dressing. "
+            "Add grilled chicken for extra protein"
+        ),
+        "brand": "Fresh Greens Co",
+        "category": "Salads",
+        "price": 8.99,
+        "countInStock": 25,
+        "rating": 4.2,
+        "numReviews": 19,
+    },
+    {
+        "_id": "7",
+        "name": "Beef Tacos (3 Pack)",
+        "image": "/images/beef-tacos.png",
+        "description": (
+            "Three soft corn tortillas filled with seasoned ground beef, fresh salsa, guacamole, "
+            "sour cream, and cilantro. Authentic Mexican street food"
+        ),
+        "brand": "El Mariachi",
+        "category": "Mexican",
+        "price": 9.99,
+        "countInStock": 18,
+        "rating": 4.4,
+        "numReviews": 31,
+    },
+    {
+        "_id": "8",
+        "name": "Chocolate Lava Cake",
+        "image": "/images/lava-cake.png",
+        "description": (
+            "Decadent chocolate cake with a molten chocolate center. "
+            "Served warm with vanilla ice cream and fresh berries"
+        ),
+        "brand": "Sweet Delights",
+        "category": "Desserts",
+        "price": 6.99,
+        "countInStock": 10,
+        "rating": 4.9,
+        "numReviews": 52,
+    },
+]
