@@ -5,6 +5,11 @@ import {
   PRODUCT_DETAILS_REQUEST,
   PRODUCT_DETAILS_SUCCESS,
   PRODUCT_DETAILS_FAIL,
+  PRODUCT_DETAILS_RESET,
+  PRODUCT_UPDATE_REQUEST,
+  PRODUCT_UPDATE_SUCCESS,
+  PRODUCT_UPDATE_FAIL,
+  PRODUCT_UPDATE_RESET,
 } from "../constants/productConstants";
 
 export const productListReducer = (state = { products: [] }, action) => {
@@ -31,6 +36,36 @@ export const productDetailsReducer = (
       return { loading: false, product: action.payload };
     case PRODUCT_DETAILS_FAIL:
       return { loading: false, error: action.payload };
+    case PRODUCT_DETAILS_RESET:
+      return {};
+    default:
+      return state;
+  }
+};
+
+export const productUpdateReducer = (
+  state = { product: { reviews: [] } },
+  action,
+) => {
+  switch (action.type) {
+    case PRODUCT_UPDATE_REQUEST:
+      return {
+        ...state,
+        loading: true,
+      };
+    case PRODUCT_UPDATE_SUCCESS:
+      return {
+        loading: false,
+        product: action.payload,
+        success: true,
+      };
+    case PRODUCT_UPDATE_FAIL:
+      return {
+        loading: false,
+        error: action.payload,
+      };
+    case PRODUCT_UPDATE_RESET:
+      return {};
     default:
       return state;
   }

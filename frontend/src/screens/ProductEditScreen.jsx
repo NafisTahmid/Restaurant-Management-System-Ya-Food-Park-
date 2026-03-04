@@ -5,7 +5,13 @@ import FormContainer from "../components/FormContainer";
 import Loader from "../components/Loader";
 import Message from "../components/Message";
 import { getProductDetails } from "../actions/productActions";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { updateProductDetails } from "../actions/productActions";
+import {
+  PRODUCT_UPDATE_RESET,
+  PRODUCT_DETAILS_RESET,
+} from "../constants/productConstants";
 
 const ProductEditScreen = () => {
   const [name, setName] = useState("");
@@ -15,25 +21,85 @@ const ProductEditScreen = () => {
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
   const [countInStock, setCountInStock] = useState(0);
+  const [uploading, setUploading] = useState(false);
   const { id } = useParams();
   const dispatch = useDispatch();
   const productDetails = useSelector((state) => state.productDetails);
   const { loading, product, error } = productDetails;
   const userLogin = useSelector((state) => state.userLogin);
   const { userInfo } = userLogin;
+  const updateProduct = useSelector((state) => state.productUpdate);
+  const {
+    loading: loadingUpdate,
+    error: errorUpdate,
+    success: successUpdate,
+    product: productUpdate,
+  } = updateProduct;
+  const navigate = useNavigate();
 
   useEffect(() => {
-    dispatch(getProductDetails(id));
+    if (successUpdate) {
+      dispatch({ type: PRODUCT_UPDATE_RESET });
+      dispatch({
+        type: PRODUCT_DETAILS_RESET,
+      });
+      navigate("/products");
+    } else {
+      if (!product || product._id !== Number(id)) {
+        dispatch(getProductDetails(id));
+      } else {
+        setName(product.name);
+        setImage(product.image);
+        setBrand(product.brand);
+        setCategory(product.category);
+        setPrice(product.price);
+        setDescription(product.description);
+        setCountInStock(product.countInStock);
+      }
+    }
+  }, [dispatch, id, product, successUpdate, navigate]);
 
-    setName(product.name);
-    setImage(product.image);
-    setBrand(product.brand);
-    setCategory(product.category);
-    setPrice(product.price);
-    setDescription(product.description);
-    setCountInStock(product.countInStock);
-  }, [id, dispatch]);
-  console.log("Product: ", product);
+  const uploadFileHandler = async (e) => {
+    try {
+      setUploading(false);
+      const file = e.target.files[0];
+      const formData = new FormData();
+      formData.append("image", file);
+      formData.append("_id", id);
+
+      const config = {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${userInfo.token}`,
+        },
+      };
+      const { data } = await axios.put(
+        "/api/products/upload/",
+        formData,
+        config,
+      );
+      setImage(data);
+      setUploading(false);
+    } catch (error) {
+      setUploading(false);
+    }
+  };
+
+  const submitHandler = (e) => {
+    e.preventDefault();
+    dispatch(
+      updateProductDetails({
+        _id: product._id,
+        name,
+        image,
+        description,
+        brand,
+        category,
+        price,
+        countInStock,
+      }),
+    );
+  };
   return (
     <div>
       <Container>
@@ -47,7 +113,7 @@ const ProductEditScreen = () => {
           <Message variant="danger">{error}</Message>
         ) : (
           <FormContainer>
-            <Form>
+            <Form onSubmit={submitHandler}>
               <Form.Group controlId="name">
                 <Form.Label>Name</Form.Label>
                 <Form.Control
@@ -62,7 +128,11 @@ const ProductEditScreen = () => {
                 <Form.Control
                   type="text"
                   placeholder="Product Image"
+                  value={image}
+                  onChange={(e) => setImage(e.target.value)}
                 ></Form.Control>
+                <Form.Label>Choose File</Form.Label>
+                <Form.Control type="file" onChange={uploadFileHandler} />
               </Form.Group>
               <Form.Group controlId="brand">
                 <Form.Label>Brand</Form.Label>
@@ -96,9 +166,11 @@ const ProductEditScreen = () => {
                 <Form.Label>Description</Form.Label>
                 <Form.Control
                   type="text"
+                  as="textarea"
                   placeholder="Product Description"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
+                  style={{ height: "100px" }}
                 ></Form.Control>
               </Form.Group>
               <Form.Group controlId="countInStock">
@@ -115,6 +187,8 @@ const ProductEditScreen = () => {
                 Update Product
               </Button>
             </Form>
+            {loadingUpdate && <Loader />}
+            {errorUpdate && <Message variant="danger">{errorUpdate}</Message>}
           </FormContainer>
         )}
       </Container>

@@ -25,7 +25,28 @@ def get_product(request, pk):
 @permission_classes([IsAdminUser])
 def uploadProductImage(request):
     data = request.data
-    product = Product.objects.get(id=data["id"])
+    product = Product.objects.get(_id=data["_id"])
     product.image = request.FILES.get("image")
     product.save()
     return Response({"detail":"Image has been uploaded!"}, status=status.HTTP_200_OK)
+
+
+@api_view(["PUT"])
+@permission_classes([IsAdminUser])
+def updateProduct(request, pk):
+    data = request.data
+    user = request.user
+
+    product = Product.objects.get(_id=pk)
+
+    product.name = data["name"]
+    product.description = data["description"]
+    product.brand = data["brand"]
+    product.category = data["category"]
+    product.price = data["price"]
+    product.countInStock = data["countInStock"]
+    product.user = user
+    product.save()
+
+    serializer = ProductSerializer(product, many=False)
+    return Response(serializer.data)
