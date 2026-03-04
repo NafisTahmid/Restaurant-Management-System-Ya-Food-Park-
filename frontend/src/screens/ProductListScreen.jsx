@@ -3,13 +3,22 @@ import { Table, Button, Container, Image, Row, Col } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { getUserList, userDelete } from "../actions/userActions";
 import { useNavigate, Link } from "react-router-dom";
-import { listProducts } from "../actions/productActions";
-
+import { listProducts, createProductAction } from "../actions/productActions";
+import { PRODUCT_CREATE_RESET } from "../constants/productConstants";
+import Loader from "../components/Loader";
+import Message from "../components/Message";
 const ProductListScreen = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const productList = useSelector((state) => state.listProducts);
   const { loading, products, error } = productList;
+  const createProduct = useSelector((state) => state.productCreate);
+  const {
+    loading: loadingCreate,
+    success: successCreate,
+    product: productCreate,
+    error: errorCreate,
+  } = createProduct;
 
   const userLogin = useSelector((state) => state.userLogin);
   const { userInfo } = userLogin;
@@ -18,7 +27,15 @@ const ProductListScreen = () => {
     if (userInfo && userInfo.isAdmin) {
       dispatch(listProducts());
     }
-  }, [userInfo, dispatch]);
+    dispatch({ type: PRODUCT_CREATE_RESET });
+    if (successCreate) {
+      navigate(`/products/edit/${productCreate._id}`);
+    }
+  }, [userInfo, dispatch, navigate, successCreate]);
+
+  const productCreateHandler = () => {
+    dispatch(createProductAction({}));
+  };
   return (
     <div>
       <Container>
@@ -27,9 +44,12 @@ const ProductListScreen = () => {
             <h1>Total products: {products.length}</h1>
           </Col>
           <Col md={3} sm={12}>
+            {loadingCreate && <Loader />}
+            {errorCreate && <Message variant="danger">{errorCreate}</Message>}
             <Button
               type="button"
               className="ms-auto text-right btn btn-lg btn-primary"
+              onClick={productCreateHandler}
             >
               <i className="fas fa-plus"></i>Create Product
             </Button>

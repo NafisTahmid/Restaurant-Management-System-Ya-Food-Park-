@@ -35,6 +35,7 @@ const ProductEditScreen = () => {
     success: successUpdate,
     product: productUpdate,
   } = updateProduct;
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -100,6 +101,7 @@ const ProductEditScreen = () => {
       }),
     );
   };
+
   return (
     <div>
       <Container>

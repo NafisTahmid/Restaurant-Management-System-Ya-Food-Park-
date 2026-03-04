@@ -50,3 +50,21 @@ def updateProduct(request, pk):
 
     serializer = ProductSerializer(product, many=False)
     return Response(serializer.data)
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def createProduct(request):
+    user = request.user
+
+    product = Product.objects.create(
+        user=user,
+        name="Sample name",
+        description="Sample description",
+        brand="Sample brand",
+        category="Sample category",
+        price = 0.00,
+        countInStock=0
+    )
+    serializer = ProductSerializer(product, many=False)
+    return Response(serializer.data)
