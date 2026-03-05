@@ -101,3 +101,6 @@ def deleteUserById(request, pk):
     user = User.objects.get(id=pk)
     user.delete()
     return Response({"detail":"User has been deleted!"},status=status.HTTP_200_OK)
+
+
+

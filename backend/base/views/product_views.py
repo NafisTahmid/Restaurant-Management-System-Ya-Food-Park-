@@ -68,3 +68,11 @@ def createProduct(request):
     )
     serializer = ProductSerializer(product, many=False)
     return Response(serializer.data)
+
+
+@api_view(["DELETE"])
+@permission_classes([IsAdminUser])
+def deleteProduct(request, pk):
+    product = Product.objects.get(_id=pk)
+    product.delete()
+    return Response({"detail":"Product deleted!"}, status=status.HTTP_200_OK)

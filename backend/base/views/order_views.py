@@ -151,5 +151,13 @@ def deliverOrder(request, pk):
     order.save()
     serializer = OrderSerializer(order, many=False)
     return Response(serializer.data)
-        
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def getUserOrders(request):
+    user = request.user
+    orders = Order.objects.filter(user=user)
+    serializer = OrderSerializer(orders, many=True)
+    return Response(serializer.data)
     

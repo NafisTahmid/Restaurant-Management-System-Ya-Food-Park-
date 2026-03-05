@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Row, Col, Button, Form, Container } from "react-bootstrap";
+import { Row, Col, Button, Form, Container, Table } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
 import { getUserDetails, userUpdateProfile } from "../actions/userActions";
 import Loader from "../components/Loader";
 import Message from "../components/Message";
 import { USER_UPDATE_PROFILE_RESET } from "../constants/userConstants";
+import { userOrderListAction } from "../actions/orderActions";
 const ProfileScreen = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -27,6 +28,12 @@ const ProfileScreen = () => {
     error: errorUpdateProfile,
     success: successUpdateProfile,
   } = updateProfile;
+  const userOrderList = useSelector((state) => state.userOrderList);
+  const {
+    loading: loadingOrders,
+    orders: userOrders,
+    error: errorOrders,
+  } = userOrderList;
   useEffect(() => {
     if (!userInfo) {
       navigate("/login");
@@ -42,9 +49,11 @@ const ProfileScreen = () => {
         setPassword(userInfoDetails.password);
         setConfirmPassword(userInfoDetails.password);
       }
+      dispatch(userOrderListAction());
     }
   }, [userInfo, navigate, dispatch, userInfoDetails, successUpdateProfile]);
 
+  console.log("My orders: ", userOrders);
   const submitHandler = (e) => {
     if (password !== confirmPassword) {
       window.alert("Passwords mismatch!!!");
@@ -65,7 +74,7 @@ const ProfileScreen = () => {
         ) : errorUserDetails ? (
           <Message variant="danger">{errorUserDetails}</Message>
         ) : (
-          <Row className="justify-content-center align-items-center">
+          <Row className="justify-content-center">
             <Col md={6} xs={12}>
               {loadingUpdateProfile && <Loader />}
               {errorUpdateProfile && (
@@ -113,7 +122,54 @@ const ProfileScreen = () => {
                 </Button>
               </Form>
             </Col>
-            <Col md={6} xs={12}></Col>
+            <Col md={6} xs={12}>
+              <div className="table-responsive">
+                <Table striped hover bordered>
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Date</th>
+                      <th>Total</th>
+                      <th>Paid</th>
+                      <th>Delivered</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {userOrders.map((order) => (
+                      <tr key={order._id}>
+                        <td>{order._id}</td>
+                        <td>{order.createdAt.slice(0, 10)}</td>
+                        <td>${order.totalPrice}</td>
+                        {order.isPaid ? (
+                          <td>{order.paidAt.slice(0, 10)}</td>
+                        ) : (
+                          <td>
+                            {
+                              <i
+                                className="fas fa-times"
+                                style={{ color: "red" }}
+                              ></i>
+                            }
+                          </td>
+                        )}
+                        {order.isDelivered ? (
+                          <td>{order.deliveredAt.slice(0, 10)}</td>
+                        ) : (
+                          <td>
+                            {
+                              <i
+                                className="fas fa-times"
+                                style={{ color: "red" }}
+                              ></i>
+                            }
+                          </td>
+                        )}
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
+              </div>
+            </Col>
           </Row>
         )}
       </Container>

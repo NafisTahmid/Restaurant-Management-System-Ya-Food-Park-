@@ -5,14 +5,17 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { login } from "../actions/userActions";
 import CheckoutSteps from "../components/CheckoutSteps";
+import Message from "../components/Message";
+import Loader from "../components/Loader";
 const LoginScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [message, setMessage] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const userLogin = useSelector((state) => state.userLogin);
-  const { userInfo } = userLogin;
+  const { userInfo, loading, error } = userLogin;
   const location = useLocation();
   const redirect = location.search ? location.search.split("=")[1] : "/";
   useEffect(() => {
@@ -20,18 +23,20 @@ const LoginScreen = () => {
       setEmail("");
       setPassword("");
       setConfirmPassword("");
+      setMessage("");
       navigate(redirect);
     }
   }, [userInfo]);
   const submitHandler = (e) => {
     e.preventDefault();
     dispatch(login(email, password));
-    navigate("/");
   };
   return (
     <FormContainer>
       <CheckoutSteps step1 />
       <h1>Sign In: </h1>
+      {loading && <Loader />}
+      {error && <Message variant="warning">{error}</Message>}
       <Form onSubmit={submitHandler}>
         <Form.Group controlId="email">
           <Form.Label>Email: </Form.Label>
