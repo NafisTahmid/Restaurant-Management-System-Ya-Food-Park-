@@ -53,7 +53,6 @@ const ProfileScreen = () => {
     }
   }, [userInfo, navigate, dispatch, userInfoDetails, successUpdateProfile]);
 
-  console.log("My orders: ", userOrders);
   const submitHandler = (e) => {
     if (password !== confirmPassword) {
       window.alert("Passwords mismatch!!!");

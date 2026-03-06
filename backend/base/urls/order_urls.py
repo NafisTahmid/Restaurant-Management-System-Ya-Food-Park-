@@ -4,6 +4,7 @@ from base.views import order_views as views
 urlpatterns = [
     path("init", views.sslcommerz_init, name="init-sslcommerz"),
     path("add", views.addOrderItems, name="add-order"),
+    path("all/", views.getAllOrders, name="get-all-orders"),
     path("success/", views.sslcommerz_success, name="ssl-success"),
     path("user-orders/",views.getUserOrders, name="user-orders"),
     path("<str:pk>/", views.getOrderById, name="order-details"),
