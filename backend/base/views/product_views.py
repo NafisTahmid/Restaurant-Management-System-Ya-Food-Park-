@@ -9,7 +9,11 @@ from base.models import Product
 
 @api_view(['GET'])
 def get_products(request):
-    products = Product.objects.all()
+    query = request.query_params.get("keyword","")
+    print("query: ", query)
+    if query == None:
+        query = ""
+    products = Product.objects.filter(name__icontains=query).order_by("pk")
     serializer = ProductSerializer(products, many=True)
     return Response(serializer.data)
 

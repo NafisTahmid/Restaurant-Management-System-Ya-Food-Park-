@@ -6,14 +6,20 @@ import { useDispatch, useSelector } from "react-redux";
 import { listProducts } from "../actions/productActions";
 import Loader from "../components/Loader";
 import Message from "../components/Message";
+import { useSearchParams } from "react-router-dom";
 const HomeScreen = () => {
   const dispatch = useDispatch();
   const productList = useSelector((state) => state.listProducts);
   const { loading, error, products } = productList;
+  const [searchParams] = useSearchParams();
+  let keyword = searchParams.get("keyword");
+  if (keyword == null) {
+    keyword = "";
+  }
 
   useEffect(() => {
-    dispatch(listProducts());
-  }, [dispatch]);
+    dispatch(listProducts(keyword));
+  }, [dispatch, keyword]);
   return (
     <div>
       <Container>
