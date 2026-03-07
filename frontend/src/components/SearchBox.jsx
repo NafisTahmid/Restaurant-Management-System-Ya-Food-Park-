@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Form, Button } from "react-bootstrap";
+import { Form, Button, Row, Col } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 const SearchBox = () => {
   const [keyword, setKeyword] = useState("");
@@ -16,17 +16,24 @@ const SearchBox = () => {
   return (
     <div>
       <Form onSubmit={submitHandler}>
-        <div className="d-flex justify-content-center align-items-center">
-          <Form.Control
-            type="text"
-            placeholder="Search your favorite food"
-            value={keyword}
-            onChange={(e) => setKeyword(e.target.value)}
-          ></Form.Control>
-          <Button type="submit" className="btn btn-sm btn-secondary ms-2">
-            SEARCH
-          </Button>
-        </div>
+        <Row>
+          <Col md={10}>
+            <Form.Control
+              type="text"
+              placeholder="Search your favorite food"
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
+            ></Form.Control>
+          </Col>
+          <Col md={2}>
+            <Button type="submit" className="btn btn-sm btn-secondary ms-2">
+              SEARCH
+            </Button>
+          </Col>
+        </Row>
+        {/* <div className="d-flex justify-content-center align-items-center"> */}
+
+        {/* </div> */}
       </Form>
     </div>
   );
