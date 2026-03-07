@@ -4,7 +4,7 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from base.products import products
 from rest_framework import status
 from base.serializers import ProductSerializer
-from base.models import Product
+from base.models import Product, Review
 
 
 @api_view(['GET'])
@@ -80,3 +80,42 @@ def deleteProduct(request, pk):
     product = Product.objects.get(_id=pk)
     product.delete()
     return Response({"detail":"Product deleted!"}, status=status.HTTP_200_OK)
+
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def addReview(request, pk):
+    data = request.data
+    user = request.user
+    product = Product.objects.get(_id=pk)
+
+    # 1. Check if user already has submitted a review
+    existingReview = product.review_set.filter(user=user).exists()
+    if existingReview:
+        return Response({"detail":"You can't post more than one review"}, status=status.HTTP_400_BAD_REQUEST)
+    
+    # 2. Check if rating exists
+    if data["rating"] == 0 or data["review"] == "":
+        return Response({"detail":"Both rating and review must be present to submit a review"}, status=status.HTTP_400_BAD_REQUEST)
+
+    # 3. Create a review
+    review = Review.objects.create(
+        product=product,
+        user=user,
+        name=user.first_name,
+        rating = data["rating"],
+        comment = data["review"]
+    )
+
+    # 4. Update product total rating and review
+    reviews = product.review_set.all()
+    total_reviews = len(reviews)
+    total_rating = 0
+
+    for i in reviews:
+        total_rating += i.rating
+    product_rating = total_rating/total_reviews
+    product.rating = product_rating
+    product.save()
+    return Response("Review added")

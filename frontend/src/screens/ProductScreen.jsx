@@ -13,14 +13,26 @@ import Rating from "../components/Rating";
 import { useDispatch, useSelector } from "react-redux";
 import Loader from "../components/Loader";
 import Message from "../components/Message";
-import { getProductDetails } from "../actions/productActions";
-import { addToCart } from "../actions/cartAction";
+import {
+  getProductDetails,
+  productCreateReviewAction,
+} from "../actions/productActions";
+// import { addToCart } from "../actions/cartAction";
+import { PRODUCT_CREATE_REVIEW_RESET } from "../constants/productConstants";
 const ProductScreen = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const productDetails = useSelector((state) => state.productDetails);
   const { loading, error, product } = productDetails;
+  const createReview = useSelector((state) => state.productCreateReview);
+  const {
+    loading: loadingReview,
+    success: successReview,
+    error: errorReview,
+  } = createReview;
   const [qty, setQty] = useState(1);
+  const [rating, setRating] = useState(0);
+  const [review, setReview] = useState("");
   const navigate = useNavigate();
 
   const addToCartHandler = () => {
@@ -30,7 +42,18 @@ const ProductScreen = () => {
 
   useEffect(() => {
     dispatch(getProductDetails(id));
-  }, [dispatch, id]);
+    if (successReview) {
+      setRating(0);
+      setReview("");
+      dispatch({ type: PRODUCT_CREATE_REVIEW_RESET });
+    }
+  }, [dispatch, id, successReview]);
+
+  const reviewSubmitHandler = (e) => {
+    e.preventDefault();
+    dispatch(productCreateReviewAction(product._id, rating, review));
+  };
+
   return (
     <div>
       <Container>
@@ -124,6 +147,63 @@ const ProductScreen = () => {
             </Col>
           </Row>
         )}
+        <Container className="my-2 justify-content-end align-items-center">
+          <Row className="">
+            <Col md={6}>
+              <h2>Write your review: </h2>
+              {loadingReview && <Loader />}
+              {errorReview && (
+                <Message variant="warning">{errorReview}</Message>
+              )}
+              <Form onSubmit={reviewSubmitHandler}>
+                <Form.Group>
+                  <Form.Label>Give a rating</Form.Label>
+                  <Form.Control
+                    as="select"
+                    value={rating}
+                    onChange={(e) => setRating(e.target.value)}
+                  >
+                    <option value="">Select rating</option>
+                    <option value="1">1 - Poor</option>
+                    <option value="2">2 - Average</option>
+                    <option value="3">3 - Good</option>
+                    <option value="4">4 - Very Good</option>
+                    <option value="5">5 - Excellent</option>
+                  </Form.Control>
+                </Form.Group>
+                <Form.Group>
+                  <Form.Label>Comment: </Form.Label>
+                  <Form.Control
+                    type="text"
+                    as="textarea"
+                    placeholder="Type your review here"
+                    value={review}
+                    onChange={(e) => setReview(e.target.value)}
+                    style={{ height: "100px" }}
+                  ></Form.Control>
+                </Form.Group>
+                <Button type="submit" className="btn btn-dark my-2">
+                  SUBMIT
+                </Button>
+              </Form>
+            </Col>
+            <Col md={6}>
+              <h2>Customer Reviews:</h2>
+              {product.reviews.map((review) => (
+                <div key={review._id}>
+                  <h6>{review.user.name}</h6>
+                  <p>Rating: {review.rating}</p>
+                  <Rating
+                    rating={review.rating}
+                    color={"#FDDA0D"}
+                    // review={`${product.rating} ratings form ${product.numReviews} reviews`}
+                  />
+                  <p>{review.comment}</p>
+                </div>
+              ))}
+            </Col>
+          </Row>
+        </Container>
       </Container>
     </div>
   );

@@ -39,24 +39,28 @@ class UserSerializerWithToken(UserSerializer):
         token = RefreshToken.for_user(obj)
         return str(token.access_token)
 
-    # def get__id(self, obj):
-    #     _id = obj.id
-    #     return _id
+
+class ReviewSerializier(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField(read_only=True)
+    class Meta:
+        model = Review
+        fields = "__all__"
     
-    # def get_name(self, obj):
-    #     name = obj.first_name
-    #     if name == "":
-    #         name = obj.email
-    #     return name
-    
-    # def get_isAdmin(self, obj):
-    #     is_admin = obj.is_staff
-    #     return is_admin
+    def get_user(self, obj):
+        item = obj.user
+        serializer = UserSerializer(item, many=False)
+        return serializer.data
 
 class ProductSerializer(serializers.ModelSerializer):
+    reviews = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = Product
         fields = "__all__"
+
+    def get_reviews(self, obj):
+        items = obj.review_set.all()
+        serializer = ReviewSerializier(items, many=True)
+        return serializer.data
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
