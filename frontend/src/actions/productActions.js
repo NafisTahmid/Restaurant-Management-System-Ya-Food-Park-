@@ -22,14 +22,16 @@ import {
 import axios from "axios";
 
 export const listProducts =
-  (keyword = "") =>
+  (keyword = "", page = 1) =>
   async (dispatch) => {
     dispatch({
       type: PRODUCT_LIST_REQUEST,
     });
 
     try {
-      const { data } = await axios.get(`/api/products/?keyword=${keyword}`);
+      const { data } = await axios.get(
+        `/api/products/?keyword=${keyword}&page=${page}`,
+      );
 
       dispatch({
         type: PRODUCT_LIST_SUCCESS,

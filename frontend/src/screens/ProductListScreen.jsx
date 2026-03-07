@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { Table, Button, Container, Image, Row, Col } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { getUserList, userDelete } from "../actions/userActions";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import {
   listProducts,
   createProductAction,
@@ -11,11 +11,18 @@ import {
 import { PRODUCT_CREATE_RESET } from "../constants/productConstants";
 import Loader from "../components/Loader";
 import Message from "../components/Message";
+import Paginate from "../components/Paginate";
 const ProductListScreen = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const productList = useSelector((state) => state.listProducts);
-  const { loading, products, error } = productList;
+  const {
+    loading,
+    products,
+    error,
+    page: paginatePage,
+    pages: paginatePages,
+  } = productList;
   const createProduct = useSelector((state) => state.productCreate);
   const {
     loading: loadingCreate,
@@ -33,13 +40,19 @@ const ProductListScreen = () => {
     success: successDelete,
     error: errorDelete,
   } = deleteProduct;
+  const [searchParams] = useSearchParams();
+  let page = searchParams.get("page") || 1;
+  let keyword = searchParams.get("keyword");
+  if (keyword === null) {
+    keyword = "";
+  }
 
   useEffect(() => {
     if (userInfo && userInfo.isAdmin) {
-      dispatch(listProducts());
+      dispatch(listProducts(keyword, page));
     }
     if (successDelete) {
-      dispatch(listProducts());
+      dispatch(listProducts(keyword, page));
     }
     dispatch({ type: PRODUCT_CREATE_RESET });
     if (successCreate) {
@@ -52,6 +65,8 @@ const ProductListScreen = () => {
     successCreate,
     successDelete,
     productCreate,
+    keyword,
+    page,
   ]);
 
   const productCreateHandler = () => {
@@ -82,59 +97,67 @@ const ProductListScreen = () => {
             </Button>
           </Col>
         </Row>
-        <div className="table-responsive">
-          <Table striped hover bordered>
-            <thead>
-              <th>ID</th>
-              <th>Image</th>
-              <th>Name</th>
-              <th>Brand</th>
-              <th>Category</th>
-              <th>Price</th>
-              <th></th>
-              <th></th>
-            </thead>
-            <tbody>
-              {products.map((product) => (
-                <tr key={product._id}>
-                  <td>{product._id}</td>
-                  <td>
-                    <Image
-                      src={product.image}
-                      fluid
-                      rounded
-                      className="mx-auto d-block"
-                      style={{
-                        width: "80px",
-                        height: "80px",
-                        objectFit: "cover",
-                      }}
-                    />
-                  </td>
-                  <td>{product.name}</td>
-                  <td>{product.brand}</td>
-                  <td>{product.category}</td>
-                  <td>${product.price}</td>
-                  <td>
-                    <Link to={`/products/edit/${product._id}`}>
-                      <Button className="btn btn-warning">
-                        <i className="fa fa-pencil"></i>
+        <div>
+          <div className="table-responsive">
+            <Table striped hover bordered>
+              <thead>
+                <th>ID</th>
+                <th>Image</th>
+                <th>Name</th>
+                <th>Brand</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th></th>
+                <th></th>
+              </thead>
+              <tbody>
+                {products.map((product) => (
+                  <tr key={product._id}>
+                    <td>{product._id}</td>
+                    <td>
+                      <Image
+                        src={product.image}
+                        fluid
+                        rounded
+                        className="mx-auto d-block"
+                        style={{
+                          width: "80px",
+                          height: "80px",
+                          objectFit: "cover",
+                        }}
+                      />
+                    </td>
+                    <td>{product.name}</td>
+                    <td>{product.brand}</td>
+                    <td>{product.category}</td>
+                    <td>${product.price}</td>
+                    <td>
+                      <Link to={`/products/edit/${product._id}`}>
+                        <Button className="btn btn-warning">
+                          <i className="fa fa-pencil"></i>
+                        </Button>
+                      </Link>
+                    </td>
+                    <td>
+                      {loadingDelete && <Loader />}
+                      {errorDelete && (
+                        <Message variant="danger">{errorDelete}</Message>
+                      )}
+                      <Button onClick={() => deleteHandler(product._id)}>
+                        <i className="fa fa-trash"></i>
                       </Button>
-                    </Link>
-                  </td>
-                  <td>
-                    {loadingDelete && <Loader />}
-                    {errorDelete && (
-                      <Message variant="danger">{errorDelete}</Message>
-                    )}
-                    <Button onClick={() => deleteHandler(product._id)}>
-                      <i className="fa fa-trash"></i>
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          </div>
+          <Paginate
+            keyword={keyword}
+            page={paginatePage}
+            pages={paginatePages}
+            isAdmin={true}
+          />
         </div>
       </Container>
     </div>

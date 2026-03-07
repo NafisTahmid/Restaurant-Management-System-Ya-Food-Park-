@@ -6,20 +6,28 @@ import { useDispatch, useSelector } from "react-redux";
 import { listProducts } from "../actions/productActions";
 import Loader from "../components/Loader";
 import Message from "../components/Message";
+import Paginate from "../components/Paginate";
 import { useSearchParams } from "react-router-dom";
 const HomeScreen = () => {
   const dispatch = useDispatch();
   const productList = useSelector((state) => state.listProducts);
-  const { loading, error, products } = productList;
+  const {
+    loading,
+    error,
+    products,
+    page: paginatorPage,
+    pages: paginatorPages,
+  } = productList;
   const [searchParams] = useSearchParams();
   let keyword = searchParams.get("keyword");
   if (keyword == null) {
     keyword = "";
   }
+  const page = searchParams.get("page") || 1;
 
   useEffect(() => {
-    dispatch(listProducts(keyword));
-  }, [dispatch, keyword]);
+    dispatch(listProducts(keyword, page));
+  }, [dispatch, keyword, page]);
   return (
     <div>
       <Container>
@@ -49,6 +57,12 @@ const HomeScreen = () => {
                 </Link>
               </Col>
             ))}
+            <Paginate
+              keyword={keyword}
+              page={page}
+              pages={paginatorPages}
+              isAdmin={false}
+            />
           </Row>
         )}
       </Container>
