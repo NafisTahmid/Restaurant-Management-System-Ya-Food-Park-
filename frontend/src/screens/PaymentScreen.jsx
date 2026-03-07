@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import FormContainer from "../components/FormContainer";
-import { Row, Col, Button, Form } from "react-bootstrap";
+import { Col, Button, Form } from "react-bootstrap";
 import CheckoutSteps from "../components/CheckoutSteps";
 import { useDispatch } from "react-redux";
 import { addPaymentMethod } from "../actions/cartAction";
 import { useNavigate } from "react-router-dom";
 const PaymentScreen = () => {
-  const [paymentMethod, setPaymentMethod] = useState("stripe");
+  const [paymentMethod, setPaymentMethod] = useState("sslcommerz");
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const submitHandler = (e) => {
@@ -25,8 +25,8 @@ const PaymentScreen = () => {
               <Form.Check
                 type="radio"
                 checked
-                label="Stripe"
-                id="stripe"
+                label="sslcommerz"
+                id="sslcommerz"
                 name="paymentMethod"
                 onChange={(e) => setPaymentMethod(e.target.value)}
               ></Form.Check>

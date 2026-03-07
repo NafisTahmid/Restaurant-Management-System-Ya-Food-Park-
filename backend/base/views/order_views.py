@@ -166,6 +166,6 @@ def getUserOrders(request):
 @api_view(["GET"])
 @permission_classes([IsAdminUser])
 def getAllOrders(request):
-    orders = Order.objects.all()
+    orders = Order.objects.all().order_by("-pk")
     serializer = OrderSerializer(orders, many=True)
     return Response(serializer.data)
