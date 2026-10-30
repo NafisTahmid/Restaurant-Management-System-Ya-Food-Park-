@@ -137,7 +137,7 @@ export const deliverOrder = (id) => async (dispatch, getState) => {
         Authorization: `Bearer ${userInfo.token}`,
       },
     };
-    const { data } = await axios.put(`/api/orders/deliver/${id}`, config);
+    const { data } = await axios.put(`/api/orders/deliver/${id}`, {}, config);
     dispatch({
       type: ORDER_DELIVER_SUCCESS,
       payload: data,
