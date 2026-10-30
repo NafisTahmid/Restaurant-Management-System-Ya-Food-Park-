@@ -1,0 +1,17 @@
+{
+  "services": {
+    "frontend": {
+      "root": "frontend/",
+      "framework": "create-react-app",
+      "outputDirectory": "build"
+    },
+    "backend": {
+      "root": "backend/",
+      "entrypoint": "backend.wsgi:application"
+    }
+  },
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": { "service": "backend" } },
+    { "source": "/(.*)", "destination": { "service": "frontend" } }
+  ]
+}

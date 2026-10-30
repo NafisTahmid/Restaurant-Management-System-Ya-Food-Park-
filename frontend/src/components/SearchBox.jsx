@@ -23,10 +23,11 @@ const SearchBox = () => {
               placeholder="Search your favorite food"
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
+              className="my-1"
             ></Form.Control>
           </Col>
           <Col md={2}>
-            <Button type="submit" className="btn btn-sm btn-secondary ms-2">
+            <Button type="submit" className="btn btn-secondary my-1 ">
               SEARCH
             </Button>
           </Col>

@@ -11,6 +11,7 @@ import requests
 from django.conf import settings
 from datetime import datetime
 from django.shortcuts import redirect
+from base.image_utils import get_image_url
 
 
 
@@ -48,7 +49,7 @@ def addOrderItems(request):
             name=product.name,
             qty = i["qty"],
             price = i["price"],
-            image = product.image.url
+            image = get_image_url(product.image, request)
         )
     # 4. Update product count in stock accordingly
         product.countInStock -= orderItem.qty
@@ -142,8 +143,8 @@ def sslcommerz_success(request):
     return Response({"message": "Payment verification failed"}, status=400)
 
 
-@permission_classes([IsAdminUser])
 @api_view(["PUT"])
+@permission_classes([IsAdminUser])
 def deliverOrder(request, pk):
     order = Order.objects.get(_id=pk)
     order.isDelivered = True

@@ -1,3 +1,8 @@
+import logging
+
+from cloudinary import uploader
+from cloudinary.exceptions import Error as CloudinaryError
+from django.conf import settings
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
@@ -6,6 +11,8 @@ from rest_framework import status
 from base.serializers import ProductSerializer
 from base.models import Product, Review
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+
+logger = logging.getLogger(__name__)
 
 
 @api_view(['GET'])
@@ -44,9 +51,52 @@ def get_product(request, pk):
 def uploadProductImage(request):
     data = request.data
     product = Product.objects.get(_id=data["_id"])
-    product.image = request.FILES.get("image")
+    image = request.FILES.get("image")
+    if image is None:
+        return Response(
+            {"detail": "Select an image to upload."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    if not all(
+        (
+            settings.CLOUDINARY_CLOUD_NAME,
+            settings.CLOUDINARY_API_KEY,
+            settings.CLOUDINARY_API_SECRET,
+        )
+    ):
+        return Response(
+            {"detail": "Cloudinary is not configured on the server."},
+            status=status.HTTP_503_SERVICE_UNAVAILABLE,
+        )
+
+    try:
+        uploaded_image = uploader.upload(
+            image,
+            folder="yaya-food-park/products",
+            resource_type="image",
+        )
+    except CloudinaryError:
+        logger.exception("Cloudinary product image upload failed.")
+        return Response(
+            {"detail": "Image upload to Cloudinary failed."},
+            status=status.HTTP_502_BAD_GATEWAY,
+        )
+
+    image_url = uploaded_image.get("secure_url")
+    if not image_url:
+        logger.error("Cloudinary product image upload returned no secure URL.")
+        return Response(
+            {"detail": "Cloudinary did not return an image URL."},
+            status=status.HTTP_502_BAD_GATEWAY,
+        )
+
+    product.image = image_url
     product.save()
-    return Response({"detail":"Image has been uploaded!"}, status=status.HTTP_200_OK)
+    return Response(
+        {"detail": "Image has been uploaded!", "image": image_url},
+        status=status.HTTP_200_OK,
+    )
 
 
 @api_view(["PUT"])

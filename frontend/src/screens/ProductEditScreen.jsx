@@ -22,6 +22,7 @@ const ProductEditScreen = () => {
   const [description, setDescription] = useState("");
   const [countInStock, setCountInStock] = useState(0);
   const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState("");
   const { id } = useParams();
   const dispatch = useDispatch();
   const productDetails = useSelector((state) => state.productDetails);
@@ -61,9 +62,15 @@ const ProductEditScreen = () => {
   }, [dispatch, id, product, successUpdate, navigate]);
 
   const uploadFileHandler = async (e) => {
+    const file = e.target.files[0];
+    if (!file) {
+      return;
+    }
+
+    setUploading(true);
+    setUploadError("");
+
     try {
-      setUploading(false);
-      const file = e.target.files[0];
       const formData = new FormData();
       formData.append("image", file);
       formData.append("_id", id);
@@ -79,9 +86,14 @@ const ProductEditScreen = () => {
         formData,
         config,
       );
-      setImage(data);
-      setUploading(false);
+      setImage(data.image);
     } catch (error) {
+      setUploadError(
+        error.response && error.response.data.detail
+          ? error.response.data.detail
+          : error.message,
+      );
+    } finally {
       setUploading(false);
     }
   };
@@ -135,6 +147,10 @@ const ProductEditScreen = () => {
                 ></Form.Control>
                 <Form.Label>Choose File</Form.Label>
                 <Form.Control type="file" onChange={uploadFileHandler} />
+                {uploading && <Loader />}
+                {uploadError && (
+                  <Message variant="danger">{uploadError}</Message>
+                )}
               </Form.Group>
               <Form.Group controlId="brand">
                 <Form.Label>Brand</Form.Label>

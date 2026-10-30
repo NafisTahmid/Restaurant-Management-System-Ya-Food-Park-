@@ -36,15 +36,15 @@ def register_user(request):
         return Response({"detail":"User already exists!"}, status=status.HTTP_400_BAD_REQUEST)
 
 
-@permission_classes([IsAuthenticated])
 @api_view(["GET"])
+@permission_classes([IsAuthenticated])
 def getUserDetails(request):
     user = request.user
     serializer = UserSerializerWithToken(user, many=False)
     return Response(serializer.data)
 
-@permission_classes([IsAuthenticated])
 @api_view(["PUT"])
+@permission_classes([IsAuthenticated])
 def updateProfile(request):
     user = request.user
     data = request.data
